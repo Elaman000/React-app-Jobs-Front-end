@@ -1,0 +1,20 @@
+.blok_registration_form{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 70vh;
+    /*border: 1px solid rgba(0, 0, 0, 0.24);*/
+
+}
+.blok_registration_form form{
+    width: 50%;
+    display: inherit;
+    justify-content: center;
+    align-items: center;
+}
+
+.button-div_submit-code{
+    padding: 10px;
+    background: #1679a0;
+    color: white;
+}
