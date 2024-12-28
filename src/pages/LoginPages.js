@@ -1,8 +1,10 @@
 import React, {useState} from "react";
 import './index.css';
+import {useNavigate} from "react-router-dom";
 
 const LoginPage = () => {
     const [errors, setErrors] = useState({}); // для ошыбки от сервера
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         email: "",
@@ -43,6 +45,7 @@ const LoginPage = () => {
 
                 alert("Вход успешна!");
                 // window.location.href = '/';
+                navigate("/");
                 setFormData({
                     email: "",
                     password: "",

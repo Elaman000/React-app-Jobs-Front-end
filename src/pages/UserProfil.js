@@ -1,10 +1,16 @@
 import logo from '../Media file/image/logo.jpg';
 import './index.css'
-import {useEffect, useState} from "react";
+import '../CSS/UserProfil.css'
+import React, {useContext, useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import UpdateUserData from "./UpdataUserPages/UpdateUserData";
-
-
+import {AppContext} from "../AppContext";
+import UserInfo from "./UpdataUserPages/UserInfo";
+import ChangeEmail from "./UpdataUserPages/ChangeEmail";
+import ChangePassword from "./UpdataUserPages/ChangePassword";
+import QuitPages from "./UpdataUserPages/QuitPage";
+import SavedPage from "./UserPages/SavedPage";
+import MainPageUserJobs from "./User Jobs Pages/MainPageUserJobs";
+import { Helmet } from 'react-helmet';
 
 const fetchData = async (url, accessToken) => {
     try {
@@ -58,18 +64,13 @@ const refreshToken = async (refreshUrl) => {
     }
 };
 
-
-
 const UserProfil = ({data}) => {
+
+    const {userData, setUserData } = useContext(AppContext);
+
     const [error, setError] = useState(false); // Обработка ошыбок
     const [loading, setLoading] = useState(true); // Обработка Загрусков
     const navigate = useNavigate();
-    const [userData, setUserData] = useState([]); // Переменная для данных
-    const [editMode, setEditMode] = useState(false); // Режим редактирования
-    const handleEditClick = () => {
-        setEditMode(!editMode); // Включить режим редактирования
-    }
-
 
     const fetchWithToken = async () => {
         setLoading(true);
@@ -91,9 +92,10 @@ const UserProfil = ({data}) => {
                         // Повторяем запрос с новым токеном
                         const datas = await fetchData(accessUrl, newAccessToken);
                         setUserData(datas); // Успешно получили данные
+                        // localStorage.setItem('userData', JSON.stringify(datas));
                         navigate("/user/");
                     } catch (refreshError) {
-                        setError("Не удалось обновить токен");
+                        setError(true);
                         console.error("Ошибка обновления токена:", refreshError);
                     }
                 } else {
@@ -108,58 +110,162 @@ const UserProfil = ({data}) => {
         }
     };
 
+    const UserPage = () =>{
+        return(
+            <>
+                <div className="block-resume">
+                    <Helmet>
+                        <title>Профиль пользователя {userData.first_name?userData.first_name:null}</title>
+                    </Helmet>
+                    <div className="logo">
+                        {!userData.photo ? <img src={logo} alt="WS Logo"/> :
+                            <img src={`http://127.0.0.1:8001${userData.photo}`} alt={`Image ${userData.last_name}`}/>}
+                        <br/>
+                    </div>
+                    <div className="info-user-resume">
+                        <h3>{userData.last_name} {userData.first_name}</h3>
+                        {userData.gender ? <>Пол: <b>{userData.gender.label}</b></> : null}
+                        <p>Дата рождения: <b>{userData.birth_date}</b></p>
+                        {userData.city ? <p>Город: <b>{userData.city.city}
+                            {userData.area && `, ${userData.area.area}`}
+                        </b></p> : null}
+                        <hr/>
+                        <b>{userData.description}</b>
+                        <p>{userData.text}</p>
+
+                        <ul style={{paddingLeft: '0', listStyleType: 'none'}}>
+                            {userData.education.label? <>
+                                <li>Образование: <b>{userData.education.label}</b></li>
+                            </>:null}
+                            {userData.experience.label? <>
+                                <li>Опыт работы: <b>{userData.experience.label}</b></li>
+                            </> : null}
+                            {userData.relocation.label? <>
+                                <li>Переезд: <b>{userData.relocation.label}</b></li>
+                            </> : null}
+                            {userData.desired_salary ? (
+                                <li>Желаемая плата: <b>{userData.desired_salary}</b> сом</li>
+                            ) : null}
+                        </ul>
+
+                        <hr/>
+                        Контакты
+                        <ul style={{paddingLeft: '0', listStyleType: 'none'}}>
+                            <li><b>Telegram:</b> <a href={''}> {userData.telegram}</a></li>
+                            <li><b>Whatsapp: </b> <a href={''}> {userData.whatsapp}</a></li>
+                            <li><b>URL Сайта: </b> <a href={''}> {userData.web_url}</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </>
+        )
+
+    }
+
+
+
+    const [activeSection, setActiveSection] = useState(
+        userData.role ? "profil":"user-vakansi"
+    );// Дефолтный раздел — изменение информации пользователя
+
     useEffect(() => {
-        fetchWithToken()
-        setUserData(data)
-    }, [data]);
+        if (userData.role !== undefined) {
+            setActiveSection(userData.role ? "profil" : "user-vakansi");
+        }
+    }, [userData]);
+
+
+
+    const renderSection = () => {
+        switch (activeSection) {
+            case "profil":
+                return <UserPage/>;
+            case "editInfo":
+                return <UserInfo data={userData} renderSectionUpdate={() => setActiveSection("profil")}  newData={(datas) => setUserData(datas)}/>;
+            case "changeEmail":
+                return <ChangeEmail data={userData.email}  />;
+            case "changePassword":
+                return <ChangePassword data={userData.email} />;
+            case "quit":
+                return <QuitPages data={userData} renderSectionUpdate={() => setActiveSection("profil")} newdata={(datas) => setUserData(datas)}/>;
+            case "saved":
+                return <SavedPage/>;
+            case "user-vakansi":
+                if (!userData || Object.keys(userData).length === 0) {
+                    return null; // Альтернативный контент
+                }else {
+                    if (!userData.role){
+                        return <MainPageUserJobs data={userData} />
+                    }
+                    return null;
+                }
+            default:
+                return <UserPage />;
+        }
+    };
+
+    useEffect(() => {
+        if (!userData){
+            fetchWithToken()
+        }
+    }, [userData]);
     return (
         <>
+
             <div className={"block-content"}>
-                {editMode?<>
-                    <UpdateUserData data={userData} clok={handleEditClick} newdata={(datas) => setUserData(datas)} />
-                </>:
-                <>
-                    <div className="body">
-                        <div className="container">
-                            <div className="content">
-                            <span className="designer">
-                            </span>
-                                <h1>{userData.first_name} {userData.last_name}</h1>
-                                <a href=""
-                                    // style="cursor: pointer;"
-                                >ddd</a>
-                                <div className="skills">
-                                <span>
-                                {userData.description}
-                                </span>
-                                </div>
-                                <p>
-                                    {userData.text}
-                                </p>
-                                <a className="btn" onClick={handleEditClick}>Изменить</a>
-                            </div>
-                            <div className="logo">
-                                {!userData.photo ? <img src={logo} alt="WS Logo"/> :
-                                    <img  src={`http://127.0.0.1:8001${userData.photo}`} alt={`Image ${userData.last_name}`}/>
-                                }
-                                <a>
-                                    <div className="icon_settings">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25"
-                                             fill="currentColor"
-                                             className="bi bi-gear" viewBox="0 0 16 16">
-                                            <path
-                                                d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
-                                            <path
-                                                d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
-                                        </svg>
+                    <>
+                        <div className={"block-updata-user"}>
+                            <div className="menu_user-profil">
+                                {/*<span>*/}
+                                {/*    Управление акаунтом*/}
+                                {/*</span>*/}
+                                <ul>
+                                    {!userData.role? <>
+                                        <div className={activeSection === "user-vakansi" ? "onclok-menu" : ''}
+                                             onClick={() => setActiveSection("user-vakansi")}>
+                                            <li>Мои вакансии</li>
+                                        </div>
+                                        <hr/>
+                                    </> : null}
+                                    <div className={activeSection === "profil" ? "onclok-menu" : ''}
+                                         onClick={() => setActiveSection("profil")}>
+                                        <li>Профиль</li>
                                     </div>
-                                </a>
+                                    <div className={activeSection === "editInfo" ? "onclok-menu" : ''}
+                                         onClick={() => setActiveSection("editInfo")}>
+                                        <li>Редактировать профиль</li>
+                                    </div>
+                                    <div className={activeSection === "changeEmail" ? "onclok-menu" : ''}
+                                         onClick={() => setActiveSection("changeEmail")}>
+                                        <li>Изменить @Email</li>
+                                    </div>
+                                    <div className={activeSection === "changePassword" ? "onclok-menu" : ''}
+                                         onClick={() => setActiveSection("changePassword")}>
+                                        <li>Изменить пароль</li>
+                                    </div>
+                                    <div className={activeSection === "quit" ? "onclok-menu" : ''}
+                                         onClick={() => setActiveSection("quit")}>
+                                        <li>Выйти</li>
+                                    </div>
+                                    <hr/>
+
+                                    <div className={activeSection === "saved" ? "onclok-menu" : ''}
+                                         onClick={() => setActiveSection("saved")}>
+                                        <li>Сохраненные</li>
+                                    </div>
+                                </ul>
+                            </div>
+
+                            <div className="content-updata-user">
+                                {renderSection()}
                             </div>
                         </div>
-                    </div>
-                </>}
+                    </>
             </div>
         </>
     )
 }
 export default UserProfil;
+
+

@@ -1,15 +1,37 @@
 
-
-
-
 import user from '../Media file/image/Group 11.png';
 import MainpageJobspage from "./MainpageJobspage";
+import {AppContext} from "../AppContext";
+import React, {useContext, useEffect, useState} from "react";
+import axios from "axios";
 
 
+const MainPages = () => {
+    const {userData,vacancies,setVacancies, setUserData ,setPage,page} = useContext(AppContext);
 
+    const [error, setError] = useState(false); // Обработка ошыбок
+    const [loading, setLoading] = useState(true); // Обработка Загрусков
 
-
-const MainPages = ({dataJobs}) => {
+    useEffect(() => {
+        if (!vacancies[0]){
+            const accessToken = localStorage.getItem('authToken'); // Или другой способ хранения токена
+            let token = JSON.parse(accessToken);
+            axios.get(`http://127.0.0.1:8002/api/v1/jobs_list/?page=${page}`, {
+                        headers: {
+                            'Authorization': `JWT ${token.tokens.access}`,
+                        }
+                })
+                .then(response => {
+                    setLoading(false);
+                    setVacancies(response.data.results);
+                    setPage(page+1)
+                })
+                .catch(error => {
+                    console.error('Ошибка при загрузке данных:', error);
+                    setError(true);
+                });
+        }
+    }, [vacancies]);
     return(
         <>
             <div className={"block-content"}>
@@ -41,7 +63,7 @@ const MainPages = ({dataJobs}) => {
                 <br/>
                 <br/>
 
-                <MainpageJobspage data={dataJobs}/>
+                <MainpageJobspage data={vacancies}/>
 
                 <br/>
                 <br/>

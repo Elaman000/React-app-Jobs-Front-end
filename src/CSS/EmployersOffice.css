@@ -1,0 +1,87 @@
+.container-panel-jobs{
+    display: flex;
+    justify-content: left;
+    margin-top: 3vh;
+}
+
+.employers-jud-block{
+    padding: 15px;
+    min-width: 10vw;
+    max-width: 20em;
+    height: 80vh;
+    border-radius: 1.2em;
+    overflow-y: auto;
+    overflow-x: clip;
+}
+
+.employers-jud-block div{
+    min-width: auto;
+    height: 80px;
+    background: #f0f0f0;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    word-break: break-word;
+    position: relative;
+    cursor: pointer;
+    padding: 10px 5px;
+}
+.panel-jobs-hover:hover::before{
+    content: "";
+    display: block;
+    width: 5px;
+    height: 60px;
+    background: rgba(83, 83, 83, 0.2);
+    position: absolute;
+    left: -13px;
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+    top: 50%;
+    transform: translate(0, -50%);
+}
+.before-onclik::before{
+    content: "";
+    display: block;
+    width: 5px;
+    height: 60px;
+    background: #2278dc;
+    position: absolute;
+    left: -13px;
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+    top: 50%;
+    transform: translate(0, -50%);
+}
+
+.content-employers-jud{
+    display: flex;
+    width: auto;
+    height: auto;
+
+}
+.block-applicants{
+    overflow-y: auto;
+    overflow-x: clip;
+}
+.applican{
+    min-width: 28vw;
+    margin: 0 0.5vw;
+    padding: 0 0.5vw;
+    height: 60px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    transition: 0.3s;
+    cursor: pointer;
+}
+.applican:hover{
+    background: rgba(0, 0, 0, 0.06);
+    transition: 0.3s;
+}
+.activ-applican{
+    background: rgba(41, 95, 202, 0.12);
+    transition: 0.3s;
+}
+.profil-applicants{
+    border: 1px solid #474747;
+    border-radius: 1.2em;
+    min-width: 40vw;
+}

@@ -472,89 +472,6 @@ code {
 }
 
 
-
-
-.body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  display: flex;
-  justify-content: space-between;
-}
-
-.container {
-  margin-top: 2%;
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.content {
-  max-width: 600px;
-}
-
-.designer {
-  color: orange;
-  font-size: 24px;
-}
-
-.name {
-  color: black;
-  font-size: 24px;
-}
-
-.skills {
-  margin-top: 10px;
-}
-
-.skills span {
-  display: inline-block;
-  background-color: #f0f0f0;
-  padding: 5px 10px;
-  margin: 5px;
-  border-radius: 5px;
-  font-size: 14px;
-}
-.logo{
-  position: relative;
-}
-
-.logo .icon_settings{
-  top: 25px;
-  right: 25px;
-  position: absolute;
-  width: 50px;
-  height: 50px;
-  background-color: rgb(152, 152, 152);
-  border-radius: 100%;
-  z-index: 2;
-  display: grid;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  cursor: pointer;
-}
-
-.logo img{
-  width:400px;
-  height: 400px;
-}
-
-.accordion{
-  margin-left: 10%;
-  width: 40em;
-}
-.block_info_jobs_company{
-  margin-top: 35px;
-  width: 80%;
-}
-.block_info_jobs_company{
-  margin: 35px 10%;
-
-}
-
-
-
 .block_filter_vakansi{
   display: block;
   width: 80%;
@@ -594,6 +511,7 @@ aside .accordion{
   color: black;
   position: relative;
   margin-bottom: 15px;
+  z-index: 1;
   transition: 0.5s;
 }
 .card_vakansi:hover{
@@ -632,7 +550,9 @@ aside .accordion{
   font-size: 1.5rem;
   cursor: pointer;
   color: #00000083;
+  z-index: 2;
 }
+
 .btn-group-vertical label{
   border-radius: 0;
 }

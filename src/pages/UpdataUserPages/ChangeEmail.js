@@ -1,11 +1,14 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
+import { Helmet } from 'react-helmet';
 
-const ChangeEmail = ({data, OnClok}) => {
+
+const ChangeEmail = ({data}) => {
     const [email, setEmail] = useState();
     const [number, setNumber] = useState();
     const [code, setCode] = useState(false); // Обработка Загрусков
     const navigate = useNavigate();
+
     const dataEmail ={
         email: email,
         code: number,
@@ -72,8 +75,13 @@ const ChangeEmail = ({data, OnClok}) => {
     return (
 
         <div>
+            <Helmet>
+                <title>Изменит Email</title>
+            </Helmet>
             <h2>Change Email</h2>
-            <h4> Ваш Email <code>{data}</code> </h4>
+            <h4> Ваш Email <code>{data}</code></h4>
+            <b>Пороль подтверждений будет отправить на ваш Email</b>
+
             <form onSubmit={sendVerificationCode}>
                 <div className="mb-3">
                     <label htmlFor="FormControlInput1" className="form-label">Новый Email адрес</label>
@@ -81,13 +89,13 @@ const ChangeEmail = ({data, OnClok}) => {
                            placeholder="" disabled={code} value={email} onChange={handleChange}/>
                 </div>
                 <button className="btn btn-outline-secondary" type="submit">Отправить</button>
-                <button className="btn btn-outline-secondary" type="submit" onClick={OnClok}>Отменить</button>
+                {/*<button className="btn btn-outline-secondary" type="submit" onClick={OnClok}>Отменить</button>*/}
             </form>
             {code ?
                 <form onSubmit={handleSubmit}>
                     <input type="text" value={number} onChange={handleChangeNumber}/>
                     <button type={"submit"}>Отправить</button>
-                </form>:null}
+                </form> : null}
 
         </div>
     )
